@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="PrivateSchoolModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Assignment">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="title" Type="String" MaxLength="30" FixedLength="true" Unicode="false" Nullable="false" />
+    <Property Name="description" Type="String" MaxLength="30" FixedLength="true" Unicode="false" />
+    <Property Name="sub_date" Type="DateTime" Precision="0" Nullable="false" />
+    <Property Name="oralMark" Type="Double" />
+    <Property Name="totalMark" Type="Double" />
+    <Property Name="courseid" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Courses" Relationship="Self.fk1_courseid" FromRole="Assignments" ToRole="Courses" />
+    <NavigationProperty Name="Students" Relationship="Self.AssignmentsPerCoursePerStudent" FromRole="Assignments" ToRole="Students" />
+  </EntityType>
+  <EntityType Name="Course">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="title" Type="String" MaxLength="30" FixedLength="true" Unicode="false" Nullable="false" />
+    <Property Name="stream" Type="String" MaxLength="30" FixedLength="true" Unicode="false" />
+    <Property Name="type" Type="String" MaxLength="30" FixedLength="true" Unicode="false" />
+    <Property Name="start_date" Type="DateTime" Precision="0" Nullable="false" />
+    <Property Name="end_date" Type="DateTime" Precision="0" Nullable="false" />
+    <NavigationProperty Name="Assignments" Relationship="Self.fk1_courseid" FromRole="Courses" ToRole="Assignments" />
+    <NavigationProperty Name="Trainers" Relationship="Self.fk_courseid" FromRole="Courses" ToRole="Trainers" />
+    <NavigationProperty Name="Students" Relationship="Self.StudentsPerCourse" FromRole="Courses" ToRole="Students" />
+  </EntityType>
+  <EntityType Name="Student">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="firstName" Type="String" MaxLength="30" FixedLength="true" Unicode="false" Nullable="false" />
+    <Property Name="lastName" Type="String" MaxLength="30" FixedLength="true" Unicode="false" Nullable="false" />
+    <Property Name="dateOfBirth" Type="DateTime" Precision="0" Nullable="false" />
+    <Property Name="tuitionFees" Type="Double" />
+    <NavigationProperty Name="Assignments" Relationship="Self.AssignmentsPerCoursePerStudent" FromRole="Students" ToRole="Assignments" />
+    <NavigationProperty Name="Courses" Relationship="Self.StudentsPerCourse" FromRole="Students" ToRole="Courses" />
+  </EntityType>
+  <EntityType Name="Trainer">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="firstName" Type="String" MaxLength="30" FixedLength="true" Unicode="false" Nullable="false" />
+    <Property Name="lastName" Type="String" MaxLength="30" FixedLength="true" Unicode="false" Nullable="false" />
+    <Property Name="subject" Type="String" MaxLength="30" FixedLength="true" Unicode="false" />
+    <Property Name="courseid" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Courses" Relationship="Self.fk_courseid" FromRole="Trainers" ToRole="Courses" />
+  </EntityType>
+  <Association Name="fk1_courseid">
+    <End Role="Courses" Type="PrivateSchoolModel.Course" Multiplicity="1" />
+    <End Role="Assignments" Type="PrivateSchoolModel.Assignment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Courses">
+        <PropertyRef Name="id" />
+      </Principal>
+      <Dependent Role="Assignments">
+        <PropertyRef Name="courseid" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="fk_courseid">
+    <End Role="Courses" Type="PrivateSchoolModel.Course" Multiplicity="1" />
+    <End Role="Trainers" Type="PrivateSchoolModel.Trainer" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Courses">
+        <PropertyRef Name="id" />
+      </Principal>
+      <Dependent Role="Trainers">
+        <PropertyRef Name="courseid" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="AssignmentsPerCoursePerStudent">
+    <End Role="Assignments" Type="PrivateSchoolModel.Assignment" Multiplicity="*" />
+    <End Role="Students" Type="PrivateSchoolModel.Student" Multiplicity="*" />
+  </Association>
+  <Association Name="StudentsPerCourse">
+    <End Role="Courses" Type="PrivateSchoolModel.Course" Multiplicity="*" />
+    <End Role="Students" Type="PrivateSchoolModel.Student" Multiplicity="*" />
+  </Association>
+  <EntityContainer Name="PrivateSchoolContext" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Assignments" EntityType="PrivateSchoolModel.Assignment" />
+    <EntitySet Name="Courses1" EntityType="PrivateSchoolModel.Course" />
+    <EntitySet Name="Students" EntityType="PrivateSchoolModel.Student" />
+    <EntitySet Name="Trainers" EntityType="PrivateSchoolModel.Trainer" />
+    <AssociationSet Name="fk1_courseid" Association="Self.fk1_courseid">
+      <End Role="Courses" EntitySet="Courses1" />
+      <End Role="Assignments" EntitySet="Assignments" />
+    </AssociationSet>
+    <AssociationSet Name="fk_courseid" Association="Self.fk_courseid">
+      <End Role="Courses" EntitySet="Courses1" />
+      <End Role="Trainers" EntitySet="Trainers" />
+    </AssociationSet>
+    <AssociationSet Name="AssignmentsPerCoursePerStudent" Association="Self.AssignmentsPerCoursePerStudent">
+      <End Role="Assignments" EntitySet="Assignments" />
+      <End Role="Students" EntitySet="Students" />
+    </AssociationSet>
+    <AssociationSet Name="StudentsPerCourse" Association="Self.StudentsPerCourse">
+      <End Role="Courses" EntitySet="Courses1" />
+      <End Role="Students" EntitySet="Students" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>
